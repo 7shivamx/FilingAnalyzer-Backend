@@ -2,6 +2,9 @@ from flask import Flask, request, render_template, abort, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from pipelines import pipeline
+from nltk.tokenize import sent_tokenize
+from sec_api import ExtractorApi
 import torch
 import torch.nn as nn
 import numpy as np
@@ -20,7 +23,7 @@ app.config['MONGO_DBNAME'] = 'interiit'
 app.config['MONGO_URI'] = 'mongodb+srv://interiit:interiit@interiit.oz53j.mongodb.net/interiit'
 mongo = PyMongo(app)
 
-with open('./dict-data.json', 'r') as f:
+with open('dict-data.json', 'r') as f:
   data = json.load(f)
 
 print("Loading Spacy...")
@@ -31,9 +34,97 @@ print("Loading Tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 print("Loading Model...")
 model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+print("Loading NLP...")
+NER = spacy.load("en_core_web_sm", disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
+nlp = pipeline("multitask-qa-qg")
+
 print("Server ready")
 
 softy = nn.Softmax(dim = -1)
+
+def get_section(filing_url, section) :
+    res = filing_url[:filing_url.index("htm") + len("htm")]
+    global extractorApi
+    section_text = extractorApi.get_section(res, section, "text")
+    return section_text
+
+def preprocess_text(text) :
+    temp_text = text.lower().replace("\n", " ").replace(' %','%')
+    return temp_text
+
+def extract_metric_vals(text, val_type = "PERCENT", NER = None):
+    if val_type == "PERCENT":
+        return re.findall(r'(\d+(?:\.\d+)?%?(?!\S))', text)
+    if val_type == "NUMBER":
+        return re.findall(r"[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)", text)
+    if val_type == "RATIO":
+        return re.findall(r"([0-9]+:[0-9]+)", text)
+    if val_type == "MONEY":
+        values = []
+        entities = NER(text)
+        for w in entities.ents:
+            if w.label_ == 'MONEY':
+                values.append(w.text)
+        return values
+    return []
+
+# 1. search the metric name in the document
+def search_metric(text_list, metric_list):
+    matched_indices = []
+    idx = 0
+    while idx < len(text_list):
+        if text_list[idx : idx+len(metric_list)] == metric_list:
+            matched_indices.append(idx)
+        idx += 1
+    return matched_indices
+
+# 2. get k words before and after the searched metric
+def extract_phrases(text_list, matched_indices, k):
+    phrases_extracted = []
+    for idx in matched_indices:
+        phrase = ""
+        for i in range(-k,k+1):
+            if idx+i < 0 or idx+i > len(text_list)-1:
+                continue
+            phrase += text_list[idx+i] + " "
+        phrases_extracted.append(phrase)
+    return phrases_extracted
+
+# 3. apply NER and check for corresonding entity
+def find_possible_values(text, metric, NER, k, val_type='PERCENT'):
+    text = text.replace(',', ' ').replace('-', ' ')
+    metric = metric.replace('-', ' ')
+    text_list = text.split(' ')
+    metric_list = metric.split(' ')
+    matched_indices = search_metric(text_list, metric_list)
+    phrases_extracted = extract_phrases(text_list, matched_indices, k)
+    possible_values = []
+    for phrase in phrases_extracted:
+        possible_values += extract_metric_vals(phrase, val_type, NER)
+    return possible_values
+
+def filter_passage(doc,metric) :
+    sents = sent_tokenize(doc)
+    filtered_sents = ".".join(s for s in sents if metric in s)
+    return filtered_sents
+
+def get_output(passage,question,metric,NER,val_type='PERCENT') :
+    tex = preprocess_text(passage)
+    filtered_passage = filter_passage(tex,metric)
+    ans = nlp({  "question": question,  "context": filtered_passage})
+    ans = ans.replace(',', ' ')
+    output_values = extract_metric_vals(ans, val_type, NER)
+    return output_values
+
+def get_correct_value(possible_values, output_values):
+    correct_values = []
+    for val1 in output_values:
+        for val2 in possible_values:
+            if val1 == val2 and val1 not in correct_values:
+                correct_values.append(val1)    
+    if len(correct_values) > 0:
+        return correct_values[-1]
+    return ''
 
 def get_class_counter(document) :
     doc = preprocess_data(document)
@@ -203,4 +294,36 @@ def earningstimeseries():
         return {"data": result}
     except Exception as e:
         print(e)
-        return "Invalid request"
+        return "Invalid request"            
+
+@app.route("/extract", methods = ["POST"])
+def extractRequest():
+    try:
+        api_key = request.form['api_key']
+        global extractorApi
+        extractorApi = ExtractorApi(api_key)
+        metric = request.form['metric']
+        val_type = request.form['val_type']
+        k = request.form['k']
+        url = request.form['url']
+        relevant_sections = request.form['request_form']
+
+        for sec in relevant_sections:
+            text = get_section(url, sec)
+            text = preprocess_text(text)
+            possible_values = find_possible_values(text, metric, NER, int(k), val_type)
+            output_values = get_output(text, f'What is the value of {metric}?', metric, NER, val_type)
+            correct_value = get_correct_value(possible_values, output_values)
+            if len(correct_value) > 0:
+                break
+        return jsonify({"correct_value" : correct_value}), 200
+            
+
+    except:
+        return jsonify({"error": "Post Parameters not provided"}), 400
+
+
+if __name__ == "__main__":
+    app.run(debug=True)    
+    
+    
