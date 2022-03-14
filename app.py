@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, abort, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from pipelines import pipeline
+from question_generation.pipelines import pipeline
 from nltk.tokenize import sent_tokenize
 from sec_api import ExtractorApi
 import torch
@@ -26,17 +26,19 @@ mongo = PyMongo(app)
 with open('dict-data.json', 'r') as f:
   data = json.load(f)
 
-print("Loading Spacy...")
-sp = spacy.load('en_core_web_lg')
-all_stopwords = sp.Defaults.stop_words
-
 print("Loading Tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 print("Loading Model...")
 model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+
 print("Loading NLP...")
 NER = spacy.load("en_core_web_sm", disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
 nlp = pipeline("multitask-qa-qg")
+
+print("Loading Spacy...")
+sp = spacy.load('en_core_web_lg')
+all_stopwords = sp.Defaults.stop_words
+
 
 print("Server ready")
 
@@ -108,7 +110,7 @@ def filter_passage(doc,metric) :
     filtered_sents = ".".join(s for s in sents if metric in s)
     return filtered_sents
 
-def get_output(passage,question,metric,NER,val_type='PERCENT') :
+def get_output_for_metrics(passage,question,metric,NER,val_type='PERCENT') :
     tex = preprocess_text(passage)
     filtered_passage = filter_passage(tex,metric)
     ans = nlp({  "question": question,  "context": filtered_passage})
@@ -298,26 +300,27 @@ def earningstimeseries():
 
 @app.route("/extract", methods = ["POST"])
 def extractRequest():
+    req_data = request.get_json()
     try:
-        api_key = request.form['api_key']
+        api_key = req_data['api_key']
         global extractorApi
         extractorApi = ExtractorApi(api_key)
-        metric = request.form['metric']
-        val_type = request.form['val_type']
-        k = request.form['k']
-        url = request.form['url']
-        relevant_sections = request.form['request_form']
+        metric = req_data['metric']
+        val_type = req_data['val_type'].upper()
+        k = 6
+        url = req_data['url']
+        relevant_sections = req_data['relevant_sections']
 
         for sec in relevant_sections:
             text = get_section(url, sec)
             text = preprocess_text(text)
             possible_values = find_possible_values(text, metric, NER, int(k), val_type)
-            output_values = get_output(text, f'What is the value of {metric}?', metric, NER, val_type)
+            output_values = get_output_for_metrics(text, f'What is the value of {metric}?', metric, NER, val_type)
             correct_value = get_correct_value(possible_values, output_values)
             if len(correct_value) > 0:
                 break
         return jsonify({"correct_value" : correct_value}), 200
-            
+        
 
     except:
         return jsonify({"error": "Post Parameters not provided"}), 400
