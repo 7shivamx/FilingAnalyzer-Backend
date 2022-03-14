@@ -19,6 +19,7 @@ joblib==1.1.0
 langcodes==3.3.0
 MarkupSafe==2.1.0
 murmurhash==1.0.6
+nltk==3.7
 numpy==1.22.3
 packaging==21.3
 pathy==0.6.1
@@ -30,6 +31,8 @@ PyYAML==6.0
 regex==2022.3.2
 requests==2.27.1
 sacremoses==0.0.47
+sec-api==1.0.9
+sentencepiece==0.1.96
 six==1.16.0
 smart-open==5.2.1
 spacy==3.2.3
