@@ -4,7 +4,8 @@ from flask_pymongo import PyMongo
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from question_generation.pipelines import pipeline
 from nltk.tokenize import sent_tokenize
-from sec_api import ExtractorApi
+from sec_api import ExtractorApi, QueryApi
+from datetime import datetime
 import torch
 import torch.nn as nn
 import numpy as np
@@ -302,25 +303,61 @@ def earningstimeseries():
 def extractRequest():
     req_data = request.get_json()
     try:
-        api_key = req_data['api_key']
+        api_key = req_data['api_key'] 
+        timeperiod = req_data['timeperiod'].lower()
+        cik = req_data['cik']
+        from_date = req_data['from_date']
+        to_date = req_data['to_date']
+
         global extractorApi
         extractorApi = ExtractorApi(api_key)
+        global queryApi 
+        queryApi = QueryApi(api_key = api_key)
+
         metric = req_data['metric']
         val_type = req_data['val_type'].upper()
         k = 6
-        url = req_data['url']
-        relevant_sections = req_data['relevant_sections']
+        relevant_sections = ['1', '2','3','4','5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
+        type_of_form = "10-K"
 
-        for sec in relevant_sections:
-            text = get_section(url, sec)
-            text = preprocess_text(text)
-            possible_values = find_possible_values(text, metric, NER, int(k), val_type)
-            output_values = get_output_for_metrics(text, f'What is the value of {metric}?', metric, NER, val_type)
-            correct_value = get_correct_value(possible_values, output_values)
-            if len(correct_value) > 0:
-                break
-        return jsonify({"correct_value" : correct_value}), 200
-        
+        if timeperiod == "annual":
+            type_of_form = "10-K"
+        else:
+            type_of_form = "10-Q"
+
+
+        query = {
+            "query": { "query_string": { 
+                "query": f"cik:{cik} AND filedAt:{{{from_date} TO {to_date}}} AND formType:\"{type_of_form}\"" 
+                } },
+            "from": "0",
+            "size": "10",
+            "sort": [{ "filedAt": { "order": "desc" } }]
+            }
+
+        return_list = queryApi.get_filings(query)
+        values = []
+
+        for filing in return_list['filings']:
+            no_value = True
+            filedAt = filing['filedAt']
+            filedAt = filedAt[:filedAt.index('T')]
+
+            for sec in relevant_sections:
+                text = get_section(filing['linkToFilingDetails'], sec)
+                text = preprocess_text(text)
+                possible_values = find_possible_values(text, metric, NER, int(k), val_type)
+                output_values = get_output_for_metrics(text, f'What is the value of {metric}?', metric, NER, val_type)
+                correct_value = get_correct_value(possible_values, output_values)
+                if len(correct_value) > 0:
+                    no_value = False
+                    values.append((correct_value, filedAt))
+                    break
+            
+            if no_value:
+                values.append(('-1', filedAt))
+
+        return jsonify({"correct_value" : values}), 200
 
     except:
         return jsonify({"error": "Post Parameters not provided"}), 400
