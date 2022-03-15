@@ -43,6 +43,15 @@ all_stopwords = sp.Defaults.stop_words
 
 print("Server ready")
 
+metric_val_type = {
+    "churn rate": "PERCENT",
+    "revenue retention": "PERCENT",
+    "LTV to CAC ratio": "RATIO",
+    "Customer Engagement Score": "NUMBER",
+    "Recurring Revenue": "PERCENT",
+    "SAAS Quick Ratio": "RATIO",
+    "SAAS Magic Number": "NUMBER"
+}
 softy = nn.Softmax(dim = -1)
 
 def get_section(filing_url, section) :
@@ -303,7 +312,7 @@ def earningstimeseries():
 def extractRequest():
     req_data = request.get_json()
     try:
-        api_key = req_data['api_key'] 
+        api_key = "b6b10b35e011e60a5e028ba927a6ae3223eca8389d7b987c93bf59f9a00f26de" 
         timeperiod = req_data['timeperiod'].lower()
         cik = req_data['cik']
         from_date = req_data['from_date']
@@ -315,7 +324,7 @@ def extractRequest():
         queryApi = QueryApi(api_key = api_key)
 
         metric = req_data['metric']
-        val_type = req_data['val_type'].upper()
+        val_type = metric_val_type[metric].upper()
         k = 6
         relevant_sections = ['1', '2','3','4','5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
         type_of_form = "10-K"
