@@ -51,8 +51,6 @@ Response: {
           }
 ```
 
-
-
 ### Metrics Extraction API
 ```
 url: /extract
@@ -71,5 +69,42 @@ Parameters: {
 Response: {
             "correct_value": [(value, date_of_doc_filling), ... ]
             <This will give the respective metric value (or -1 if not found) along with the filing date of the doc>
+          }
+```
+
+### Dict-Sentiment Analysis API
+```
+url: /dictsent
+method: POST
+
+Successful: 200
+Parameters: {   
+                "q": <Text String to check Sentiment>              
+            }
+            
+Response: {
+           'Constraining',
+           'Negative',
+           'Uncertainty',
+           'Litigious',
+           'Weak_Modal',
+           'Positive'
+          }
+```
+
+### Bert-Sentiment Analysis API
+```
+url: /bertinf
+method: POST
+
+Successful: 200
+Parameters: {   
+                "q": <Text String to check Sentiment>              
+            }
+            
+Response: {
+           'negative',
+           'neutral',
+           'positive'
           }
 ```
