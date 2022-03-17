@@ -133,7 +133,7 @@ def get_correct_value(possible_values, output_values):
     for val1 in output_values:
         for val2 in possible_values:
             if val1 == val2 and val1 not in correct_values:
-                correct_values.append(val1)    
+                correct_values.append(val1)
     if len(correct_values) > 0:
         return correct_values[-1]
     return ''
@@ -215,7 +215,7 @@ def companybyname():
     try:
         name = req_data["name"]
         result = mongo.db.targets.find_one({'Name': re.compile('^' + re.escape(name) + '$', re.IGNORECASE)})
-        return {"cik": result["CIK"], "ticker": result["Ticker"]}
+        return {"cik": result["CIK"], "ticker": result["Ticker"], "ARR": result["ARR"], "NRR": result["NRR"], "Customers": result["Customers"]}
     except Exception as e:
         print(e)
         return "Invalid request"
@@ -227,7 +227,7 @@ def companybycik():
     try:
         cik = req_data["cik"]
         result = mongo.db.targets.find_one({'CIK': cik})
-        return {"name": result["Name"], "ticker": result["Ticker"]}
+        return {"name": result["Name"], "ticker": result["Ticker"], "ARR": result["ARR"], "NRR": result["NRR"], "Customers": result["Customers"]}
     except Exception as e:
         print(e)
         return "Invalid request"
@@ -239,7 +239,7 @@ def companybyticker():
     try:
         ticker = req_data["ticker"]
         result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
-        return {"name": result["Name"], "cik": result["CIK"]}
+        return {"name": result["Name"], "cik": result["CIK"], "ARR": result["ARR"], "NRR": result["NRR"], "Customers": result["Customers"]}
     except Exception as e:
         print(e)
         return "Invalid request"
@@ -306,13 +306,13 @@ def earningstimeseries():
         return {"data": result}
     except Exception as e:
         print(e)
-        return "Invalid request"            
+        return "Invalid request"
 
 @app.route("/extract", methods = ["POST"])
 def extractRequest():
     req_data = request.get_json()
     try:
-        api_key = "b6b10b35e011e60a5e028ba927a6ae3223eca8389d7b987c93bf59f9a00f26de" 
+        api_key = "b6b10b35e011e60a5e028ba927a6ae3223eca8389d7b987c93bf59f9a00f26de"
         timeperiod = req_data['timeperiod'].lower()
         cik = req_data['cik']
         from_date = req_data['from_date']
@@ -320,7 +320,7 @@ def extractRequest():
 
         global extractorApi
         extractorApi = ExtractorApi(api_key)
-        global queryApi 
+        global queryApi
         queryApi = QueryApi(api_key = api_key)
 
         metric = req_data['metric']
@@ -336,8 +336,8 @@ def extractRequest():
 
 
         query = {
-            "query": { "query_string": { 
-                "query": f"cik:{cik} AND filedAt:{{{from_date} TO {to_date}}} AND formType:\"{type_of_form}\"" 
+            "query": { "query_string": {
+                "query": f"cik:{cik} AND filedAt:{{{from_date} TO {to_date}}} AND formType:\"{type_of_form}\""
                 } },
             "from": "0",
             "size": "10",
@@ -362,7 +362,7 @@ def extractRequest():
                     no_value = False
                     values.append((correct_value, filedAt))
                     break
-            
+
             if no_value:
                 values.append(('-1', filedAt))
 
@@ -373,6 +373,4 @@ def extractRequest():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)    
-    
-    
+    app.run(debug=True)
