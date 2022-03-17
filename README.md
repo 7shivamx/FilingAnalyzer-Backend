@@ -108,3 +108,57 @@ Response: {
            'positive'
           }
 ```
+
+### Company Overview API
+```
+url: /overviewbyticker
+method: POST
+
+Successful: 200
+Parameters: {   
+                "ticker": <ticker of the company>              
+            }
+            
+Response: {
+            'description',
+            'exchange',
+            'quater',
+            'pe',
+            'divi',
+            'eps',
+            'profitmargin',
+            'operatingmarginttm'
+          }
+```
+
+### Metrics Timeseries API
+```
+url: /incometimeseries
+method: POST
+
+Successful: 200
+Parameters: {   
+                "ticker": <ticker of the company>,
+                "timeperiod": <annual (10-K forms)/quaterly (10-Q forms)>             
+            }
+            
+Response: {
+           "data": [(date, opex, gpm), ... ]
+          }
+```
+
+### EPS Timeseries API
+```
+url: /earningstimeseries
+method: POST
+
+Successful: 200
+Parameters: {   
+                "ticker": <ticker of the company>,
+                "timeperiod": <annual (10-K forms)/quaterly (10-Q forms)>             
+            }
+            
+Response: {
+            "data": [(date, eps), ... ]
+          }
+```
