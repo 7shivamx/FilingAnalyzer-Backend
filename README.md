@@ -15,7 +15,10 @@ Parameters: {
 
 Response: {
             "cik": <cik of the company>, 
-            "ticker": <ticker of the company>
+            "ticker": <ticker of the company>,
+            "ARR": <latest ARR from db>,
+            "NRR": <latest NRR/NDR from db>,
+            "Customers": <total customers of the company>
           }
 ```
 
@@ -31,7 +34,10 @@ Parameters: {
 
 Response: {
             "name": <name of the company>, 
-            "ticker": <ticker of the company>
+            "ticker": <ticker of the company>,
+            "ARR": <latest ARR from db>,
+            "NRR": <latest NRR/NDR from db>,
+            "Customers": <total customers of the company>
           }
 ```
 
@@ -47,7 +53,10 @@ Parameters: {
 
 Response: {
             "name": <name of the company>, 
-            "cik": <cik of the company>
+            "cik": <cik of the company>,
+            "ARR": <latest ARR from db>,
+            "NRR": <latest NRR/NDR from db>,
+            "Customers": <total customers of the company>
           }
 ```
 
