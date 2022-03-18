@@ -180,14 +180,14 @@ def get_output(text) :
   mean_vals = np.mean(sentiment,axis = 0).tolist()
   infer_dict = {'positive' : mean_vals[0],'negative' : mean_vals[1],'neutral' : mean_vals[2]}
   return infer_dict
-  
+
 def ratio_to_float(ratio):
     numer,denum = ratio.split(":")
     if int(denum) == 0:
         num = math.inf
     else:
         num = int(numer)/int(denum)
-    return num  
+    return num
 
 # For serving frontend
 @app.route('/')
@@ -288,6 +288,18 @@ def twitbyticker():
         print(e)
         return "Invalid request"
 
+# Dict and Finbert sentiments of last 10k by ticker
+@app.route("/sentibyticker", methods = ["POST"])
+def sentibyticker():
+    req_data = request.get_json()
+    try:
+        ticker = req_data["ticker"]
+        result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
+        return {"dictSenti": result["dictSenti"], "finbSenti": result["finbSenti"]}
+    except Exception as e:
+        print(e)
+        return "Invalid request"
+
 # Company overview by ticker (Current pe ratio, eps, operating margin(TTM), etc)
 @app.route("/overviewbyticker", methods = ["POST"])
 def overviewbyticker():
@@ -329,7 +341,7 @@ def incometimeseries():
             if gpm_val >= 75:
                 gpm_status = "good"
             if gpm_val <= 70:
-                gpm_status = "bad"    
+                gpm_status = "bad"
             result.append({"date": x["fiscalDateEnding"], "opex": x["operatingExpenses"], "gpm": gpm_val, "condition": gpm_status})
         return {"data": result}
     except Exception as e:
@@ -440,7 +452,7 @@ def extractRequest():
                        elif met_val <= 40:
                            condition = "bad"
                        else:
-                           condition = "neutral"                
+                           condition = "neutral"
                     elif metric == "Recurring Revenue":
                        met_val = float(met_val.strip(' \t\n\r%'))
                        if met_val >= 10:
