@@ -104,7 +104,7 @@ Response: {
 
 ### QnA and Summary By Ticker API
 ```
-url: /tsbyticker
+url: /qnabyticker
 method: POST
 
 Successful: 200
@@ -115,6 +115,22 @@ Parameters: {
 Response: {
             "qna": <array of dictionaries with keys 'question' and 'answer'> 
             "summary": <text summary>            
+          }
+```
+
+### Sentiments By Ticker API
+```
+url: /sentibyticker
+method: POST
+
+Successful: 200
+Parameters: {
+                "ticker": <ticker of the company>
+            }
+
+Response: {
+            "dictSenti": <Dictionary with probabilities of 6-7 classes according to the found occurrence> 
+            "finbSenti": <Dictionary with probabilities of 'positive', 'neutral' & 'negative'>            
           }
 ```
 
@@ -139,42 +155,6 @@ Response: {
           }
 ```
 
-### Dict-Sentiment Analysis API
-```
-url: /dictsent
-method: POST
-
-Successful: 200
-Parameters: {   
-                "q": <Text String to check Sentiment>              
-            }
-            
-Response: {
-           'Constraining',
-           'Negative',
-           'Uncertainty',
-           'Litigious',
-           'Weak_Modal',
-           'Positive'
-          }
-```
-
-### Bert-Sentiment Analysis API
-```
-url: /bertinf
-method: POST
-
-Successful: 200
-Parameters: {   
-                "q": <Text String to check Sentiment>              
-            }
-            
-Response: {
-           'negative',
-           'neutral',
-           'positive'
-          }
-```
 
 ### Company Overview API
 ```
