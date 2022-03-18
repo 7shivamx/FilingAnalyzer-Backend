@@ -251,7 +251,31 @@ def tsbyticker():
     try:
         ticker = req_data["ticker"]
         result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
-        return {"arrTS": result["arrTS"], "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"]}
+        return {"arrTS": result["arrTS"], "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"]}
+    except Exception as e:
+        print(e)
+        return "Invalid request"
+
+# QnA and Summary by ticker
+@app.route("/qnabyticker", methods = ["POST"])
+def qnabyticker():
+    req_data = request.get_json()
+    try:
+        ticker = req_data["ticker"]
+        result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
+        return {"qna": result["qna"], "summary": result["summary"]}
+    except Exception as e:
+        print(e)
+        return "Invalid request"
+
+# Twitter trending words by ticker
+@app.route("/twitbyticker", methods = ["POST"])
+def twitbyticker():
+    req_data = request.get_json()
+    try:
+        ticker = req_data["ticker"]
+        result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
+        return {"trendingWords": result["trendingWords"]}
     except Exception as e:
         print(e)
         return "Invalid request"
