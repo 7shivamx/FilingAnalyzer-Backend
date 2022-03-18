@@ -60,6 +60,26 @@ Response: {
           }
 ```
 
+### Timeseries By Ticker API
+```
+url: /tsbyticker
+method: POST
+
+Successful: 200
+Parameters: {
+                "ticker": <ticker of the company>
+            }
+
+Response: {
+            "arrTS": <ARR timeseries>, 
+            "nrrTS": <NRR timeseries>,
+            "custTS": <customer timeseries>,
+            "smTS": <sales and marketing expense timeseries>,
+            "empTS": <employee timeseries>
+            "quarTS": <total customers of the company>            
+          }
+```
+
 ### Metrics Extraction API
 ```
 url: /extract
