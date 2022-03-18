@@ -1,6 +1,12 @@
 # FilingAnalyzer-Backend
 Inter IIT Tech Meet Digital Alpha Challenge IIT Kanpur Backend Repo
 
+## How to host
+
+1. On the terminal, `cd` into the project folder and run `./setup.sh` to create virtual environment and install required dependencies.
+
+2. Now execute `./start.sh` to host the server.
+
 ## API endpoints
 
 ### Company By Name API
