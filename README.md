@@ -75,8 +75,9 @@ Response: {
             "nrrTS": <NRR timeseries>,
             "custTS": <customer timeseries>,
             "smTS": <sales and marketing expense timeseries>,
-            "empTS": <employee timeseries>
-            "quarTS": <total customers of the company>            
+            "empTS": <employee timeseries>,
+            "quarTS": <total customers of the company>,
+            "srcTS": <source filings for data>            
           }
 ```
 
