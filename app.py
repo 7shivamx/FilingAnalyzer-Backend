@@ -244,6 +244,18 @@ def companybyticker():
         print(e)
         return "Invalid request"
 
+# Main Timeseries by ticker
+@app.route("/tsbyticker", methods = ["POST"])
+def tsbyticker():
+    req_data = request.get_json()
+    try:
+        ticker = req_data["ticker"]
+        result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
+        return {"arrTS": result["arrTS"], "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"]}
+    except Exception as e:
+        print(e)
+        return "Invalid request"
+
 # Company overview by ticker (Current pe ratio, eps, operating margin(TTM), etc)
 @app.route("/overviewbyticker", methods = ["POST"])
 def overviewbyticker():
