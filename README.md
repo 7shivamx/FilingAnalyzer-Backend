@@ -80,6 +80,37 @@ Response: {
           }
 ```
 
+### Trending words By Ticker API
+```
+url: /twitbyticker
+method: POST
+
+Successful: 200
+Parameters: {
+                "ticker": <ticker of the company>
+            }
+
+Response: {
+            "trendingWords": <trending words at twitter>            
+          }
+```
+
+### QnA and Summary By Ticker API
+```
+url: /tsbyticker
+method: POST
+
+Successful: 200
+Parameters: {
+                "ticker": <ticker of the company>
+            }
+
+Response: {
+            "qna": <array of dictionaries with keys 'question' and 'answer'> 
+            "summary": <text summary>            
+          }
+```
+
 ### Metrics Extraction API
 ```
 url: /extract
