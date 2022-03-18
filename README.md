@@ -60,6 +60,26 @@ Response: {
           }
 ```
 
+### Timeseries By Ticker API
+```
+url: /tsbyticker
+method: POST
+
+Successful: 200
+Parameters: {
+                "ticker": <ticker of the company>
+            }
+
+Response: {
+            "arrTS": <ARR timeseries>, 
+            "nrrTS": <NRR timeseries>,
+            "custTS": <customer timeseries>,
+            "smTS": <sales and marketing expense timeseries>,
+            "empTS": <employee timeseries>
+            "quarTS": <total customers of the company>            
+          }
+```
+
 ### Metrics Extraction API
 ```
 url: /extract
@@ -76,7 +96,7 @@ Parameters: {
             }
             
 Response: {
-            "correct_value": [(value, date_of_doc_filling), ... ]
+            "correct_value": [(value, date_of_doc_filling, condition), ... ]
             <This will give the respective metric value (or -1 if not found) along with the filing date of the doc>
           }
 ```
@@ -152,7 +172,7 @@ Parameters: {
             }
             
 Response: {
-           "data": [(date, opex, gpm), ... ]
+           "data": [(date, opex, gpm, condition), ... ]
           }
 ```
 
