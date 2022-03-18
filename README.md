@@ -134,6 +134,21 @@ Response: {
           }
 ```
 
+### Sectionwise Data of last 10k By Ticker API
+```
+url: /secbyticker
+method: POST
+
+Successful: 200
+Parameters: {
+                "ticker": <ticker of the company>
+            }
+
+Response: {
+            "sectionwise": <Dictionary of items 1-16 along with 1a,1b,7a,9a,9b>            
+          }
+```
+
 ### Metrics Extraction API
 ```
 url: /extract

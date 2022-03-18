@@ -300,6 +300,18 @@ def sentibyticker():
         print(e)
         return "Invalid request"
 
+# Sectionwise data of last 10k by ticker
+@app.route("/secbyticker", methods = ["POST"])
+def secbyticker():
+    req_data = request.get_json()
+    try:
+        ticker = req_data["ticker"]
+        result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
+        return {"sectionwise": result["sectionwise"]}
+    except Exception as e:
+        print(e)
+        return "Invalid request"
+
 # Company overview by ticker (Current pe ratio, eps, operating margin(TTM), etc)
 @app.route("/overviewbyticker", methods = ["POST"])
 def overviewbyticker():
