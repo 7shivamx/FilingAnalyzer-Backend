@@ -180,6 +180,14 @@ def get_output(text) :
   mean_vals = np.mean(sentiment,axis = 0).tolist()
   infer_dict = {'positive' : mean_vals[0],'negative' : mean_vals[1],'neutral' : mean_vals[2]}
   return infer_dict
+  
+def ratio_to_float(ratio):
+    numer,denum = ratio.split(":")
+    if int(denum) == 0:
+        num = math.inf
+    else:
+        num = int(numer)/int(denum)
+    return num  
 
 # For serving frontend
 @app.route('/')
@@ -293,7 +301,12 @@ def incometimeseries():
             data = data["quarterlyReports"]
         result = []
         for x in data:
-            result.append({"date": x["fiscalDateEnding"], "opex": x["operatingExpenses"], "gpm": float(x["grossProfit"])/float(x["totalRevenue"])*100})
+            gpm_val = float(x["grossProfit"])/float(x["totalRevenue"])*100
+            if gpm_val >= 75:
+                gpm_status = "good"
+            if gpm_val <= 70:
+                gpm_status = "bad"    
+            result.append({"date": x["fiscalDateEnding"], "opex": x["operatingExpenses"], "gpm": gpm_val, "condition": gpm_status})
         return {"data": result}
     except Exception as e:
         print(e)
@@ -372,7 +385,62 @@ def extractRequest():
                 correct_value = get_correct_value(possible_values, output_values)
                 if len(correct_value) > 0:
                     no_value = False
-                    values.append((correct_value, filedAt))
+                    met_val = correct_value
+                    if metric == "churn rate":
+                       met_val = float(met_val.strip(' \t\n\r%'))
+                       if met_val <= 1:
+                           condition = "good"
+                       elif met_val >= 2:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"
+                    elif metric == "revenue retention":
+                       met_val = float(met_val.strip(' \t\n\r%'))
+                       if met_val >= 90:
+                           condition = "good"
+                       elif met_val < 70:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"
+                    elif metric == "LTV to CAC ratio":
+                       c = ratio_to_float(met_val)
+                       if c >= 3:
+                           condition = "good"
+                       elif c <= 1:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"
+                    elif metric == "Customer Engagement Score":
+                       if met_val >= 71:
+                           condition = "good"
+                       elif met_val <= 40:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"                
+                    elif metric == "Recurring Revenue":
+                       met_val = float(met_val.strip(' \t\n\r%'))
+                       if met_val >= 10:
+                           condition = "good"
+                       elif met_val <= 5.7:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"
+                    elif metric == "SAAS Quick Ratio":
+                       c = ratio_to_float(met_val)
+                       if c >= 4:
+                           condition = "good"
+                       elif c <= 1:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"
+                    elif metric == "SAAS Magic Number":
+                       if met_val >= 0.75:
+                           condition = "good"
+                       elif met_val <= 0.50:
+                           condition = "bad"
+                       else:
+                           condition = "neutral"
+                    values.append((correct_value, filedAt, condition))
                     break
 
             if no_value:
