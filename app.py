@@ -223,6 +223,7 @@ def companybyname():
     try:
         name = req_data["name"]
         result = mongo.db.targets.find_one({'Name': re.compile('^' + re.escape(name) + '$', re.IGNORECASE)})
+
         return {"cik": result["CIK"], "ticker": result["Ticker"], "ARR": result["ARR"], "NRR": result["NRR"], "Customers": result["Customers"]}
     except Exception as e:
         print(e)
@@ -261,6 +262,8 @@ def tsbyticker():
         result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
         pbTS = [None]
         icacTS = [None]
+        mg = None
+        cac = None
         for (idx, t) in enumerate(result["quarTS"]):
             if idx==0:
                 continue
@@ -272,7 +275,19 @@ def tsbyticker():
                 icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
             else:
                 icacTS.append(None)
-        return {"arrTS": result["arrTS"], "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS}
+        if result["arrTS"][-2] and result["arrTS"][-3] and result["smTS"][-3]:
+            mg = (result["arrTS"][-2]-result["arrTS"][-3])/result["smTS"][-3]
+        if mg != '--' and result["gmTS"][-2] and mg:
+            cac = mg*result["gmTS"][-2]
+        if mg:
+            mg = str(mg)
+        else:
+            mg = "--"
+        if cac:
+            cac = str(cac)
+        else:
+            cac = "--"
+        return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS}
     except Exception as e:
         print(e)
         return "Invalid request"

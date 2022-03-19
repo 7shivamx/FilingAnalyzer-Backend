@@ -1,13 +1,16 @@
-# FilingAnalyzer-Backend
-Inter IIT Tech Meet Digital Alpha Challenge IIT Kanpur Backend Repo
+# SaaS-Analyzer Backend
+Inter IIT Tech Meet 10.0 <br>
+Digital Alpha Challenge Backend Repo
 
 ## How to host
 
-1. On the terminal, `cd` into the project folder and run `./setup.sh` to create virtual environment and install required dependencies.
+1. On the terminal, `cd` into the project folder 
 
-2. Now execute `./start.sh` to host the server.
+2. Run `./setup.sh` to create virtual environment and install required dependencies.
 
-3. Visit `localhost:5000` to access the frontend.
+3. Now execute `./start.sh` to host the server.
+
+4. Visit `localhost:5000` to access the frontend.
 
 ## API endpoints
 
