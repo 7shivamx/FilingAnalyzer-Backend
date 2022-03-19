@@ -16,7 +16,7 @@ import spacy
 import requests
 
 # Initialize Flask
-app = Flask(__name__, static_url_path='/static', template_folder='static')
+app = Flask(__name__, static_url_path='', template_folder='static')
 CORS(app)
 
 # MongoDB setup
