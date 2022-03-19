@@ -259,7 +259,20 @@ def tsbyticker():
     try:
         ticker = req_data["ticker"]
         result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
-        return {"arrTS": result["arrTS"], "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"]}
+        pbTS = [None]
+        icacTS = [None]
+        for (idx, t) in enumerate(result["quarTS"]):
+            if idx==0:
+                continue
+            if result["smTS"][idx-1] and result["arrTS"][idx-1] and result["arrTS"][idx] and result["gmTS"][idx]:
+                pbTS.append(result["smTS"][idx-1]/((result["arrTS"][idx]-result["arrTS"][idx-1])*result["gmTS"][idx]))
+            else:
+                pbTS.append(None)
+            if result["smTS"][idx-1] and result["custTS"][idx-1] and result["custTS"][idx]:
+                icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
+            else:
+                icacTS.append(None)
+        return {"arrTS": result["arrTS"], "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS}
     except Exception as e:
         print(e)
         return "Invalid request"
@@ -376,6 +389,79 @@ def earningstimeseries():
         for x in data:
             result.append({"date": x["fiscalDateEnding"], "eps": x["reportedEPS"]})
         return {"data": result}
+    except Exception as e:
+        print(e)
+        return "Invalid request"
+
+# Master api for csv
+@app.route("/masterbytickers", methods = ["POST"])
+def masterbytickers():
+    req_data = request.get_json()
+    try:
+        final = [];
+        tickers = req_data["tickers"]
+        t1 = req_data["from"]
+        t2 = req_data["to"]
+        for ticker in tickers:
+            result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
+            result = {
+                "CIK": result["CIK"],
+                "Name": result["Name"],
+                "Ticker": result["Ticker"],
+                "description": result["description"],
+                "exchange": result["exchange"],
+                "arrTS": result["arrTS"],
+                "custTS": result["custTS"],
+                "empTS": result["empTS"],
+                "nrrTS": result["nrrTS"],
+                "quarTS": result["quarTS"],
+                "smTS": result["smTS"],
+                "srcTS": result["srcTS"]
+            }
+            pbTS = [None]
+            icacTS = [None]
+            for (idx, t) in enumerate(result["quarTS"]):
+                if idx==0:
+                    continue
+                if result["smTS"][idx-1] and result["arrTS"][idx-1] and result["arrTS"][idx] and result["gmTS"][idx]:
+                    pbTS.append(result["smTS"][idx-1]/((result["arrTS"][idx]-result["arrTS"][idx-1])*result["gmTS"][idx]))
+                else:
+                    pbTS.append(None)
+                if result["smTS"][idx-1] and result["custTS"][idx-1] and result["custTS"][idx]:
+                    icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
+                else:
+                    icacTS.append(None)
+            arrTS = []
+            custTS = []
+            empTS = []
+            nrrTS = []
+            quarTS = []
+            smTS = []
+            srcTS = []
+            pbTS1 = []
+            icacTS1 = []
+            for (idx, t) in enumerate(result["quarTS"]):
+                if t1 <= t and t2 >= t:
+                    quarTS.append(result["quarTS"][idx])
+                    arrTS.append(result["arrTS"][idx])
+                    custTS.append(result["custTS"][idx])
+                    empTS.append(result["empTS"][idx])
+                    nrrTS.append(result["nrrTS"][idx])
+                    smTS.append(result["smTS"][idx])
+                    srcTS.append(result["srcTS"][idx])
+                    pbTS1.append(pbTS[idx])
+                    icacTS1.append(icacTS[idx])
+            result["arrTS"] = arrTS
+            result["custTS"] = custTS
+            result["empTS"] = empTS
+            result["nrrTS"] = nrrTS
+            result["quarTS"] = quarTS
+            result["smTS"]= smTS
+            result["srcTS"] = srcTS
+            result["pbTS"]= pbTS1
+            result["icacTS"] = icacTS1
+            final.append(result)
+        return {"master": final}
     except Exception as e:
         print(e)
         return "Invalid request"
