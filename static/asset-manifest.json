@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/static/css/main.4c4eb0b3.chunk.css",
-    "main.js": "/static/js/main.2d91b29d.chunk.js",
-    "main.js.map": "/static/js/main.2d91b29d.chunk.js.map",
+    "main.js": "/static/js/main.2c10cdc6.chunk.js",
+    "main.js.map": "/static/js/main.2c10cdc6.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.7df2bef5.js",
     "runtime-main.js.map": "/static/js/runtime-main.7df2bef5.js.map",
     "static/css/2.f4cb9c36.chunk.css": "/static/css/2.f4cb9c36.chunk.css",
-    "static/js/2.63e4d5ba.chunk.js": "/static/js/2.63e4d5ba.chunk.js",
-    "static/js/2.63e4d5ba.chunk.js.map": "/static/js/2.63e4d5ba.chunk.js.map",
+    "static/js/2.599d54cf.chunk.js": "/static/js/2.599d54cf.chunk.js",
+    "static/js/2.599d54cf.chunk.js.map": "/static/js/2.599d54cf.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.f4cb9c36.chunk.css.map": "/static/css/2.f4cb9c36.chunk.css.map",
     "static/css/main.4c4eb0b3.chunk.css.map": "/static/css/main.4c4eb0b3.chunk.css.map",
-    "static/js/2.63e4d5ba.chunk.js.LICENSE.txt": "/static/js/2.63e4d5ba.chunk.js.LICENSE.txt",
-    "static/js/main.2d91b29d.chunk.js.LICENSE.txt": "/static/js/main.2d91b29d.chunk.js.LICENSE.txt",
+    "static/js/2.599d54cf.chunk.js.LICENSE.txt": "/static/js/2.599d54cf.chunk.js.LICENSE.txt",
+    "static/js/main.2c10cdc6.chunk.js.LICENSE.txt": "/static/js/main.2c10cdc6.chunk.js.LICENSE.txt",
     "static/media/bg1.jpg": "/static/media/bg1.2abd2bc6.jpg",
     "static/media/bg3.jpg": "/static/media/bg3.c775e086.jpg",
     "static/media/card-danger.png": "/static/media/card-danger.8cb1a52f.png",
@@ -20,6 +20,7 @@
     "static/media/card-success.png": "/static/media/card-success.b6634da7.png",
     "static/media/card-warning.png": "/static/media/card-warning.da888537.png",
     "static/media/black-dashboard-pro-react.scss?v=1.2.0": "/static/media/night-sky-full-of-stars-fantasy-animation-made-of-magical-sparkly-light-particles-flickering-on-a-purple-blue-gradient-background_bajacpz7x_thumbnail-full01.e6a30d27.png",
+    "static/media/digitalalpha.0a884015.png": "/static/media/digitalalpha.0a884015.png",
     "static/media/emilyz.jpg": "/static/media/emilyz.48a62490.jpg",
     "static/media/gucci.png": "/static/media/gucci.18c1cba2.png",
     "static/media/image_placeholder.ae264cfc.jpg": "/static/media/image_placeholder.ae264cfc.jpg",
@@ -37,8 +38,8 @@
   "entrypoints": [
     "static/js/runtime-main.7df2bef5.js",
     "static/css/2.f4cb9c36.chunk.css",
-    "static/js/2.63e4d5ba.chunk.js",
+    "static/js/2.599d54cf.chunk.js",
     "static/css/main.4c4eb0b3.chunk.css",
-    "static/js/main.2d91b29d.chunk.js"
+    "static/js/main.2c10cdc6.chunk.js"
   ]
 }
