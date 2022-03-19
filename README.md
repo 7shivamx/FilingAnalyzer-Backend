@@ -7,6 +7,8 @@ Inter IIT Tech Meet Digital Alpha Challenge IIT Kanpur Backend Repo
 
 2. Now execute `./start.sh` to host the server.
 
+3. Visit `localhost:5000` to access the frontend.
+
 ## API endpoints
 
 ### Company By Name API
