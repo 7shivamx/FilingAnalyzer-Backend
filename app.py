@@ -262,6 +262,7 @@ def tsbyticker():
         result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
         pbTS = [None]
         icacTS = [None]
+        ltvTS = []
         mg = None
         cac = None
         for (idx, t) in enumerate(result["quarTS"]):
@@ -275,6 +276,10 @@ def tsbyticker():
                 icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
             else:
                 icacTS.append(None)
+            if result["arrTS"][idx] and result["custTS"][idx] and result["nrrTS"][idx] and result["gmTS"][idx]:
+                ltvTS.append((result["arrTS"][idx]/result["custTS"][idx])*result["nrrTS"][idx]*(((result["nrrTS"][idx])**5)-1)/(result["nrrTS"][idx]-1)*(0.774**5)*result["gmTS"][idx])
+            else:
+                ltvTS.append(None)
         if result["arrTS"][-2] and result["arrTS"][-3] and result["smTS"][-3]:
             mg = (result["arrTS"][-2]-result["arrTS"][-3])/result["smTS"][-3]
         if mg != '--' and result["gmTS"][-2] and mg:
@@ -287,7 +292,7 @@ def tsbyticker():
             cac = str(cac)
         else:
             cac = "--"
-        return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS}
+        return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
     except Exception as e:
         print(e)
         return "Invalid request"
@@ -431,10 +436,12 @@ def masterbytickers():
                 "nrrTS": result["nrrTS"],
                 "quarTS": result["quarTS"],
                 "smTS": result["smTS"],
-                "srcTS": result["srcTS"]
+                "srcTS": result["srcTS"],
+                "gmTS": result["gmTS"]
             }
             pbTS = [None]
             icacTS = [None]
+            ltvTS = []
             for (idx, t) in enumerate(result["quarTS"]):
                 if idx==0:
                     continue
@@ -446,6 +453,10 @@ def masterbytickers():
                     icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
                 else:
                     icacTS.append(None)
+                if result["arrTS"][idx] and result["custTS"][idx] and result["nrrTS"][idx] and result["gmTS"][idx]:
+                    ltvTS.append((result["arrTS"][idx]/result["custTS"][idx])*result["nrrTS"][idx]*(((result["nrrTS"][idx])**5)-1)/(result["nrrTS"][idx]-1)*(0.774**5)*result["gmTS"][idx])
+                else:
+                    ltvTS.append(None)
             arrTS = []
             custTS = []
             empTS = []
@@ -453,8 +464,10 @@ def masterbytickers():
             quarTS = []
             smTS = []
             srcTS = []
+            gmTS = []
             pbTS1 = []
             icacTS1 = []
+            ltvTS1 = []
             for (idx, t) in enumerate(result["quarTS"]):
                 if t1 <= t and t2 >= t:
                     quarTS.append(result["quarTS"][idx])
@@ -466,6 +479,7 @@ def masterbytickers():
                     srcTS.append(result["srcTS"][idx])
                     pbTS1.append(pbTS[idx])
                     icacTS1.append(icacTS[idx])
+                    ltvTS1.append(ltvTS[idx])
             result["arrTS"] = arrTS
             result["custTS"] = custTS
             result["empTS"] = empTS
@@ -473,8 +487,10 @@ def masterbytickers():
             result["quarTS"] = quarTS
             result["smTS"]= smTS
             result["srcTS"] = srcTS
+            result["gmTS"] = gmTS
             result["pbTS"]= pbTS1
             result["icacTS"] = icacTS1
+            result["ltvTS"] = ltvTS1
             final.append(result)
         return {"master": final}
     except Exception as e:
