@@ -265,6 +265,7 @@ def tsbyticker():
         ltvTS = []
         mg = None
         cac = None
+        ltvcac = None
         for (idx, t) in enumerate(result["quarTS"]):
             if idx==0:
                 continue
@@ -292,7 +293,9 @@ def tsbyticker():
             cac = str(cac)
         else:
             cac = "--"
-        return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
+        if ltvTS[-2] and icacTS[-2]:
+            ltvcac = str(ltvTS[-2]/icacTS[-2])
+        return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "ltvcac": ltvcac, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
     except Exception as e:
         print(e)
         return "Invalid request"
