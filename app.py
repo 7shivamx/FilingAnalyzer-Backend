@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, abort, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from question_generation.pipelines import pipeline
+# from transformers import AutoTokenizer, AutoModelForSequenceClassification
+# from question_generation.pipelines import pipeline
 from nltk.tokenize import sent_tokenize
 from sec_api import ExtractorApi, QueryApi
 from datetime import datetime
@@ -12,7 +12,7 @@ import numpy as np
 import re
 import os
 import json
-import spacy
+# import spacy
 import requests
 
 # Initialize Flask
@@ -27,32 +27,32 @@ mongo = PyMongo(app)
 with open('dict-data.json', 'r') as f:
   data = json.load(f)
 
-print("Loading Tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
-print("Loading Model...")
-model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+# print("Loading Tokenizer...")
+# tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
+# print("Loading Model...")
+# model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
 
-print("Loading NLP...")
-NER = spacy.load("en_core_web_sm", disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
-nlp = pipeline("multitask-qa-qg")
+# print("Loading NLP...")
+# NER = spacy.load("en_core_web_sm", disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
+# nlp = pipeline("multitask-qa-qg")
 
-print("Loading Spacy...")
-sp = spacy.load('en_core_web_lg')
-all_stopwords = sp.Defaults.stop_words
+# print("Loading Spacy...")
+# sp = spacy.load('en_core_web_lg')
+# all_stopwords = sp.Defaults.stop_words
 
 
 print("Server ready")
 
-metric_val_type = {
-    "churn rate": "PERCENT",
-    "revenue retention": "PERCENT",
-    "LTV to CAC ratio": "RATIO",
-    "Customer Engagement Score": "NUMBER",
-    "Recurring Revenue": "PERCENT",
-    "SAAS Quick Ratio": "RATIO",
-    "SAAS Magic Number": "NUMBER"
-}
-softy = nn.Softmax(dim = -1)
+# metric_val_type = {
+#     "churn rate": "PERCENT",
+#     "revenue retention": "PERCENT",
+#     "LTV to CAC ratio": "RATIO",
+#     "Customer Engagement Score": "NUMBER",
+#     "Recurring Revenue": "PERCENT",
+#     "SAAS Quick Ratio": "RATIO",
+#     "SAAS Magic Number": "NUMBER"
+# }
+# softy = nn.Softmax(dim = -1)
 
 def get_section(filing_url, section) :
     res = filing_url[:filing_url.index("htm") + len("htm")]
@@ -64,21 +64,21 @@ def preprocess_text(text) :
     temp_text = text.lower().replace("\n", " ").replace(' %','%')
     return temp_text
 
-def extract_metric_vals(text, val_type = "PERCENT", NER = None):
-    if val_type == "PERCENT":
-        return re.findall(r'(\d+(?:\.\d+)?%?(?!\S))', text)
-    if val_type == "NUMBER":
-        return re.findall(r"[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)", text)
-    if val_type == "RATIO":
-        return re.findall(r"([0-9]+:[0-9]+)", text)
-    if val_type == "MONEY":
-        values = []
-        entities = NER(text)
-        for w in entities.ents:
-            if w.label_ == 'MONEY':
-                values.append(w.text)
-        return values
-    return []
+# def extract_metric_vals(text, val_type = "PERCENT", NER = None):
+#     if val_type == "PERCENT":
+#         return re.findall(r'(\d+(?:\.\d+)?%?(?!\S))', text)
+#     if val_type == "NUMBER":
+#         return re.findall(r"[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)", text)
+#     if val_type == "RATIO":
+#         return re.findall(r"([0-9]+:[0-9]+)", text)
+#     if val_type == "MONEY":
+#         values = []
+#         entities = NER(text)
+#         for w in entities.ents:
+#             if w.label_ == 'MONEY':
+#                 values.append(w.text)
+#         return values
+#     return []
 
 # 1. search the metric name in the document
 def search_metric(text_list, metric_list):
@@ -103,30 +103,30 @@ def extract_phrases(text_list, matched_indices, k):
     return phrases_extracted
 
 # 3. apply NER and check for corresonding entity
-def find_possible_values(text, metric, NER, k, val_type='PERCENT'):
-    text = text.replace(',', ' ').replace('-', ' ')
-    metric = metric.replace('-', ' ')
-    text_list = text.split(' ')
-    metric_list = metric.split(' ')
-    matched_indices = search_metric(text_list, metric_list)
-    phrases_extracted = extract_phrases(text_list, matched_indices, k)
-    possible_values = []
-    for phrase in phrases_extracted:
-        possible_values += extract_metric_vals(phrase, val_type, NER)
-    return possible_values
+# def find_possible_values(text, metric, NER, k, val_type='PERCENT'):
+#     text = text.replace(',', ' ').replace('-', ' ')
+#     metric = metric.replace('-', ' ')
+#     text_list = text.split(' ')
+#     metric_list = metric.split(' ')
+#     matched_indices = search_metric(text_list, metric_list)
+#     phrases_extracted = extract_phrases(text_list, matched_indices, k)
+#     possible_values = []
+#     for phrase in phrases_extracted:
+#         possible_values += extract_metric_vals(phrase, val_type, NER)
+#     return possible_values
 
 def filter_passage(doc,metric) :
     sents = sent_tokenize(doc)
     filtered_sents = ".".join(s for s in sents if metric in s)
     return filtered_sents
 
-def get_output_for_metrics(passage,question,metric,NER,val_type='PERCENT') :
-    tex = preprocess_text(passage)
-    filtered_passage = filter_passage(tex,metric)
-    ans = nlp({  "question": question,  "context": filtered_passage})
-    ans = ans.replace(',', ' ')
-    output_values = extract_metric_vals(ans, val_type, NER)
-    return output_values
+# def get_output_for_metrics(passage,question,metric,NER,val_type='PERCENT') :
+#     tex = preprocess_text(passage)
+#     filtered_passage = filter_passage(tex,metric)
+#     ans = nlp({  "question": question,  "context": filtered_passage})
+#     ans = ans.replace(',', ' ')
+#     output_values = extract_metric_vals(ans, val_type, NER)
+#     return output_values
 
 def get_correct_value(possible_values, output_values):
     correct_values = []
@@ -159,13 +159,13 @@ def preprocess_data(doc) :
   document = document.lower()
   return document
 
-def get_sentiment(text) :
-  input_ids1 = tokenizer(text, truncation=True,padding=True, max_length=128, return_tensors='pt').input_ids
-  with torch.no_grad() :
-    output = model(input_ids1)['logits']
-  probs = softy(output).cpu().numpy()
-  # infer_dict = {'positive' : probs[0],'negative' : probs[1], 'neutral' : probs[2]}
-  return probs
+# def get_sentiment(text) :
+#   input_ids1 = tokenizer(text, truncation=True,padding=True, max_length=128, return_tensors='pt').input_ids
+#   with torch.no_grad() :
+#     output = model(input_ids1)['logits']
+#   probs = softy(output).cpu().numpy()
+#   # infer_dict = {'positive' : probs[0],'negative' : probs[1], 'neutral' : probs[2]}
+#   return probs
 
 def process_text(document):
   document = re.sub('[^\.A-Za-z0-9]+', ' ', document)
