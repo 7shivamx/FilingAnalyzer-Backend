@@ -318,17 +318,16 @@ def overviewbyticker():
     req_data = request.get_json()
     try:
         ticker = req_data["ticker"]
-        req = requests.get(url = "https://www.alphavantage.co/query", params = {"function":"OVERVIEW", "apikey":"PQCT0KTQ95W1SK9W", "symbol":ticker})
-        data = req.json()
+        result = mongo.db.targets.find_one({'Ticker': re.compile('^' + re.escape(ticker) + '$', re.IGNORECASE)})
         return {
-            "description":data["Description"],
-            "exchange":data["Exchange"],
-            "quater":data["LatestQuarter"],
-            "pe":data["PERatio"],
-            "divi":data["DividendPerShare"],
-            "eps":data["EPS"],
-            "profitmargin":data["ProfitMargin"],
-            "operatingmarginttm":data["OperatingMarginTTM"]
+            "description": result["description"],
+            "exchange": result["exchange"],
+            "quater": result["quater"],
+            "pe": result["pe"],
+            "divi": result["divi"],
+            "eps": result["eps"],
+            "profitmargin": result["profitmargin"],
+            "operatingmarginttm": result["operatingmarginttm"]
         }
     except Exception as e:
         print(e)
