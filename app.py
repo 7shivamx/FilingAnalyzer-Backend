@@ -194,27 +194,27 @@ def ratio_to_float(ratio):
 def index():
     return render_template('index.html')
 
-@app.route("/dictsent", methods = ["POST"])
-def sentimentRequest1():
-    req_data = request.get_json()
-    try:
-        sentence = req_data['q']
-        sent_dict = get_class_counter(sentence)
-        return jsonify(sent_dict)
-    except Exception as e:
-        print(e)
-        return "Invalid request"
-
-@app.route("/bertinf", methods = ["POST"])
-def sentimentRequest2():
-    req_data = request.get_json()
-    try:
-        sentence = req_data['q']
-        bert_dict = get_output(sentence)
-        return jsonify(bert_dict)
-    except Exception as e:
-        print(e)
-        return "Invalid request"
+# @app.route("/dictsent", methods = ["POST"])
+# def sentimentRequest1():
+#     req_data = request.get_json()
+#     try:
+#         sentence = req_data['q']
+#         sent_dict = get_class_counter(sentence)
+#         return jsonify(sent_dict)
+#     except Exception as e:
+#         print(e)
+#         return "Invalid request"
+#
+# @app.route("/bertinf", methods = ["POST"])
+# def sentimentRequest2():
+#     req_data = request.get_json()
+#     try:
+#         sentence = req_data['q']
+#         bert_dict = get_output(sentence)
+#         return jsonify(bert_dict)
+#     except Exception as e:
+#         print(e)
+#         return "Invalid request"
 
 # CIK, Ticker by name
 @app.route("/companybyname", methods = ["POST"])
@@ -380,123 +380,123 @@ def earningstimeseries():
         print(e)
         return "Invalid request"
 
-@app.route("/extract", methods = ["POST"])
-def extractRequest():
-    req_data = request.get_json()
-    try:
-        api_key = "b6b10b35e011e60a5e028ba927a6ae3223eca8389d7b987c93bf59f9a00f26de"
-        timeperiod = req_data['timeperiod'].lower()
-        cik = req_data['cik']
-        from_date = req_data['from_date']
-        to_date = req_data['to_date']
-
-        global extractorApi
-        extractorApi = ExtractorApi(api_key)
-        global queryApi
-        queryApi = QueryApi(api_key = api_key)
-
-        metric = req_data['metric']
-        val_type = metric_val_type[metric].upper()
-        k = 6
-        relevant_sections = ['1', '2','3','4','5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
-        type_of_form = "10-K"
-
-        if timeperiod == "annual":
-            type_of_form = "10-K"
-        else:
-            type_of_form = "10-Q"
-
-
-        query = {
-            "query": { "query_string": {
-                "query": f"cik:{cik} AND filedAt:{{{from_date} TO {to_date}}} AND formType:\"{type_of_form}\""
-                } },
-            "from": "0",
-            "size": "10",
-            "sort": [{ "filedAt": { "order": "desc" } }]
-            }
-
-        return_list = queryApi.get_filings(query)
-        values = []
-
-        for filing in return_list['filings']:
-            no_value = True
-            filedAt = filing['filedAt']
-            filedAt = filedAt[:filedAt.index('T')]
-
-            for sec in relevant_sections:
-                text = get_section(filing['linkToFilingDetails'], sec)
-                text = preprocess_text(text)
-                possible_values = find_possible_values(text, metric, NER, int(k), val_type)
-                output_values = get_output_for_metrics(text, f'What is the value of {metric}?', metric, NER, val_type)
-                correct_value = get_correct_value(possible_values, output_values)
-                if len(correct_value) > 0:
-                    no_value = False
-                    met_val = correct_value
-                    if metric == "churn rate":
-                       met_val = float(met_val.strip(' \t\n\r%'))
-                       if met_val <= 1:
-                           condition = "good"
-                       elif met_val >= 2:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    elif metric == "revenue retention":
-                       met_val = float(met_val.strip(' \t\n\r%'))
-                       if met_val >= 90:
-                           condition = "good"
-                       elif met_val < 70:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    elif metric == "LTV to CAC ratio":
-                       c = ratio_to_float(met_val)
-                       if c >= 3:
-                           condition = "good"
-                       elif c <= 1:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    elif metric == "Customer Engagement Score":
-                       if met_val >= 71:
-                           condition = "good"
-                       elif met_val <= 40:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    elif metric == "Recurring Revenue":
-                       met_val = float(met_val.strip(' \t\n\r%'))
-                       if met_val >= 10:
-                           condition = "good"
-                       elif met_val <= 5.7:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    elif metric == "SAAS Quick Ratio":
-                       c = ratio_to_float(met_val)
-                       if c >= 4:
-                           condition = "good"
-                       elif c <= 1:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    elif metric == "SAAS Magic Number":
-                       if met_val >= 0.75:
-                           condition = "good"
-                       elif met_val <= 0.50:
-                           condition = "bad"
-                       else:
-                           condition = "neutral"
-                    values.append((correct_value, filedAt, condition))
-                    break
-
-            if no_value:
-                values.append(('-1', filedAt))
-
-        return jsonify({"correct_value" : values}), 200
-
-    except:
-        return jsonify({"error": "Post Parameters not provided"}), 400
+# @app.route("/extract", methods = ["POST"])
+# def extractRequest():
+#     req_data = request.get_json()
+#     try:
+#         api_key = "b6b10b35e011e60a5e028ba927a6ae3223eca8389d7b987c93bf59f9a00f26de"
+#         timeperiod = req_data['timeperiod'].lower()
+#         cik = req_data['cik']
+#         from_date = req_data['from_date']
+#         to_date = req_data['to_date']
+#
+#         global extractorApi
+#         extractorApi = ExtractorApi(api_key)
+#         global queryApi
+#         queryApi = QueryApi(api_key = api_key)
+#
+#         metric = req_data['metric']
+#         val_type = metric_val_type[metric].upper()
+#         k = 6
+#         relevant_sections = ['1', '2','3','4','5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
+#         type_of_form = "10-K"
+#
+#         if timeperiod == "annual":
+#             type_of_form = "10-K"
+#         else:
+#             type_of_form = "10-Q"
+#
+#
+#         query = {
+#             "query": { "query_string": {
+#                 "query": f"cik:{cik} AND filedAt:{{{from_date} TO {to_date}}} AND formType:\"{type_of_form}\""
+#                 } },
+#             "from": "0",
+#             "size": "10",
+#             "sort": [{ "filedAt": { "order": "desc" } }]
+#             }
+#
+#         return_list = queryApi.get_filings(query)
+#         values = []
+#
+#         for filing in return_list['filings']:
+#             no_value = True
+#             filedAt = filing['filedAt']
+#             filedAt = filedAt[:filedAt.index('T')]
+#
+#             for sec in relevant_sections:
+#                 text = get_section(filing['linkToFilingDetails'], sec)
+#                 text = preprocess_text(text)
+#                 possible_values = find_possible_values(text, metric, NER, int(k), val_type)
+#                 output_values = get_output_for_metrics(text, f'What is the value of {metric}?', metric, NER, val_type)
+#                 correct_value = get_correct_value(possible_values, output_values)
+#                 if len(correct_value) > 0:
+#                     no_value = False
+#                     met_val = correct_value
+#                     if metric == "churn rate":
+#                        met_val = float(met_val.strip(' \t\n\r%'))
+#                        if met_val <= 1:
+#                            condition = "good"
+#                        elif met_val >= 2:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     elif metric == "revenue retention":
+#                        met_val = float(met_val.strip(' \t\n\r%'))
+#                        if met_val >= 90:
+#                            condition = "good"
+#                        elif met_val < 70:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     elif metric == "LTV to CAC ratio":
+#                        c = ratio_to_float(met_val)
+#                        if c >= 3:
+#                            condition = "good"
+#                        elif c <= 1:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     elif metric == "Customer Engagement Score":
+#                        if met_val >= 71:
+#                            condition = "good"
+#                        elif met_val <= 40:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     elif metric == "Recurring Revenue":
+#                        met_val = float(met_val.strip(' \t\n\r%'))
+#                        if met_val >= 10:
+#                            condition = "good"
+#                        elif met_val <= 5.7:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     elif metric == "SAAS Quick Ratio":
+#                        c = ratio_to_float(met_val)
+#                        if c >= 4:
+#                            condition = "good"
+#                        elif c <= 1:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     elif metric == "SAAS Magic Number":
+#                        if met_val >= 0.75:
+#                            condition = "good"
+#                        elif met_val <= 0.50:
+#                            condition = "bad"
+#                        else:
+#                            condition = "neutral"
+#                     values.append((correct_value, filedAt, condition))
+#                     break
+#
+#             if no_value:
+#                 values.append(('-1', filedAt))
+#
+#         return jsonify({"correct_value" : values}), 200
+#
+#     except:
+#         return jsonify({"error": "Post Parameters not provided"}), 400
 
 
 if __name__ == "__main__":
