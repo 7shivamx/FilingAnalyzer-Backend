@@ -1,5 +1,7 @@
 # FilingAnalyzer-ML 
 
+## Files Description
+
 1. dict-sentiment.py  -> For sentiment analysis(6 classes - lexicon based)
 
     - Input: The input of the file is specified in the `text`. 
