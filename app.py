@@ -270,31 +270,34 @@ def tsbyticker():
             if idx==0:
                 continue
             if result["smTS"][idx-1] and result["arrTS"][idx-1] and result["arrTS"][idx] and result["gmTS"][idx]:
-                pbTS.append(result["smTS"][idx-1]/((result["arrTS"][idx]-result["arrTS"][idx-1])*result["gmTS"][idx]))
+                pbTS.append(round((result["smTS"][idx-1]/((result["arrTS"][idx]-result["arrTS"][idx-1])*result["gmTS"][idx])/1000), 2))
             else:
                 pbTS.append(None)
             if result["smTS"][idx-1] and result["custTS"][idx-1] and result["custTS"][idx]:
-                icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
+                icacTS.append(round(result["smTS"][idx-1]*1000/(result["custTS"][idx]-result["custTS"][idx-1]),2))
             else:
                 icacTS.append(None)
             if result["arrTS"][idx] and result["custTS"][idx] and result["nrrTS"][idx] and result["gmTS"][idx]:
-                ltvTS.append((result["arrTS"][idx]/result["custTS"][idx])*result["nrrTS"][idx]*(((result["nrrTS"][idx])**5)-1)/(result["nrrTS"][idx]-1)*(0.774**5)*result["gmTS"][idx])
+                ltvTS.append(round((result["arrTS"][idx]*1000000/result["custTS"][idx])*result["nrrTS"][idx]*(((result["nrrTS"][idx])**5)-1)/(result["nrrTS"][idx]-1)*(0.774**5)*result["gmTS"][idx], 2))
             else:
                 ltvTS.append(None)
         if result["arrTS"][-2] and result["arrTS"][-3] and result["smTS"][-3]:
-            mg = (result["arrTS"][-2]-result["arrTS"][-3])/result["smTS"][-3]
+            mg = (result["arrTS"][-2]-result["arrTS"][-3])/result["smTS"][-3]*1000
         if mg != '--' and result["gmTS"][-2] and mg:
             cac = mg*result["gmTS"][-2]
         if mg:
-            mg = str(mg)
+            mg = str(round(mg, 2))
         else:
             mg = "--"
         if cac:
-            cac = str(cac)
+            cac = str(round(cac, 2))
         else:
             cac = "--"
         if ltvTS[-2] and icacTS[-2]:
             ltvcac = str(ltvTS[-2]/icacTS[-2])
+        for (idx, x) in enumerate(result["nrrTS"]):
+            if x:
+                result["nrrTS"][idx] = round(float(x)*100, 2)
         return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "ltvcac": ltvcac, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
     except Exception as e:
         print(e)
