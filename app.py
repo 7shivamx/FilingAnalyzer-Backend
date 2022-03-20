@@ -191,6 +191,10 @@ def ratio_to_float(ratio):
 
 # For serving frontend
 @app.route('/')
+@app.route('/saas')
+@app.route('/saas/search')
+@app.route('/saas/compare')
+@app.route('/saas/extract')
 def index():
     return render_template('index.html')
 
