@@ -452,17 +452,20 @@ def masterbytickers():
                 if idx==0:
                     continue
                 if result["smTS"][idx-1] and result["arrTS"][idx-1] and result["arrTS"][idx] and result["gmTS"][idx]:
-                    pbTS.append(result["smTS"][idx-1]/((result["arrTS"][idx]-result["arrTS"][idx-1])*result["gmTS"][idx]))
+                    pbTS.append(round((result["smTS"][idx-1]/((result["arrTS"][idx]-result["arrTS"][idx-1])*result["gmTS"][idx])/1000), 2))
                 else:
                     pbTS.append(None)
                 if result["smTS"][idx-1] and result["custTS"][idx-1] and result["custTS"][idx]:
-                    icacTS.append(result["smTS"][idx-1]/(result["custTS"][idx]-result["custTS"][idx-1]))
+                    icacTS.append(round(result["smTS"][idx-1]*1000/(result["custTS"][idx]-result["custTS"][idx-1]),2))
                 else:
                     icacTS.append(None)
                 if result["arrTS"][idx] and result["custTS"][idx] and result["nrrTS"][idx] and result["gmTS"][idx]:
-                    ltvTS.append((result["arrTS"][idx]/result["custTS"][idx])*result["nrrTS"][idx]*(((result["nrrTS"][idx])**5)-1)/(result["nrrTS"][idx]-1)*(0.774**5)*result["gmTS"][idx])
+                    ltvTS.append(round((result["arrTS"][idx]*1000000/result["custTS"][idx])*result["nrrTS"][idx]*(((result["nrrTS"][idx])**5)-1)/(result["nrrTS"][idx]-1)*(0.774**5)*result["gmTS"][idx], 2))
                 else:
                     ltvTS.append(None)
+            for (idx, x) in enumerate(result["nrrTS"]):
+                if x:
+                    result["nrrTS"][idx] = round(float(x)*100, 2)
             arrTS = []
             custTS = []
             empTS = []
