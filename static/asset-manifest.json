@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/static/css/main.4c4eb0b3.chunk.css",
-    "main.js": "/static/js/main.ad835f88.chunk.js",
-    "main.js.map": "/static/js/main.ad835f88.chunk.js.map",
+    "main.js": "/static/js/main.a118b32a.chunk.js",
+    "main.js.map": "/static/js/main.a118b32a.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.7df2bef5.js",
     "runtime-main.js.map": "/static/js/runtime-main.7df2bef5.js.map",
     "static/css/2.f4cb9c36.chunk.css": "/static/css/2.f4cb9c36.chunk.css",
@@ -12,7 +12,7 @@
     "static/css/2.f4cb9c36.chunk.css.map": "/static/css/2.f4cb9c36.chunk.css.map",
     "static/css/main.4c4eb0b3.chunk.css.map": "/static/css/main.4c4eb0b3.chunk.css.map",
     "static/js/2.599d54cf.chunk.js.LICENSE.txt": "/static/js/2.599d54cf.chunk.js.LICENSE.txt",
-    "static/js/main.ad835f88.chunk.js.LICENSE.txt": "/static/js/main.ad835f88.chunk.js.LICENSE.txt",
+    "static/js/main.a118b32a.chunk.js.LICENSE.txt": "/static/js/main.a118b32a.chunk.js.LICENSE.txt",
     "static/media/bg1.jpg": "/static/media/bg1.2abd2bc6.jpg",
     "static/media/bg3.jpg": "/static/media/bg3.c775e086.jpg",
     "static/media/card-danger.png": "/static/media/card-danger.8cb1a52f.png",
@@ -40,6 +40,6 @@
     "static/css/2.f4cb9c36.chunk.css",
     "static/js/2.599d54cf.chunk.js",
     "static/css/main.4c4eb0b3.chunk.css",
-    "static/js/main.ad835f88.chunk.js"
+    "static/js/main.a118b32a.chunk.js"
   ]
 }
