@@ -294,7 +294,7 @@ def tsbyticker():
         else:
             cac = "--"
         if ltvTS[-2] and icacTS[-2]:
-            ltvcac = str(ltvTS[-2]/icacTS[-2])
+            ltvcac = str(round(ltvTS[-2]/icacTS[-2], 2))
         for (idx, x) in enumerate(result["nrrTS"]):
             if x:
                 result["nrrTS"][idx] = round(float(x)*100, 2)
