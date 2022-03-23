@@ -18,7 +18,7 @@ import io
 import requests
 
 # Initialize Flask
-app = Flask(__name__, static_url_path='', static_folder='static', template_folder='static')
+app = Flask(__name__, static_url_path='/saas', static_folder='static', template_folder='static')
 CORS(app)
 
 # MongoDB setup
