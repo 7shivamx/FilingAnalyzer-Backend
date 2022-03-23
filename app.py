@@ -311,7 +311,7 @@ def tsbyticker():
             if counter == 0:
                 darr.append(None)
             else:
-            	if !result["arrTS"][counter-1] or !arr:
+            	if (not result["arrTS"][counter-1]) or (not arr):
             		darr.append(None)
             	else:
                	    darr.append(arr-result["arrTS"][counter-1])
@@ -527,7 +527,7 @@ def masterbytickers():
             prev_ARR = None
             for (idx, t) in enumerate(result["quarTS"]):
                 if t1 <= t and t2 >= t:
-                    if !prev_ARR or !result["arrTS"][idx]:
+                    if (not prev_ARR) or (not result["arrTS"][idx]):
                         darr = None
                     else:
                         darr = result["arrTS"][idx] - prev_ARR
