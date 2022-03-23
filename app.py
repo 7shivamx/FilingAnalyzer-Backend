@@ -304,7 +304,17 @@ def tsbyticker():
         for (idx, x) in enumerate(result["nrrTS"]):
             if x:
                 result["nrrTS"][idx] = round(float(x)*100, 2)
-        return {"arrTS": result["arrTS"], "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "ltvcac": ltvcac, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
+        
+        counter = 0
+        darr = []
+        for arr in result["arrTS"]:
+            if counter == 0:
+                darr.append(None)
+            else:
+                darr.append(arr-result["arrTS"][counter-1])
+            counter += 1
+
+        return {"arrTS": result["arrTS"], "darr": darr, "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "ltvcac": ltvcac, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
     except Exception as e:
         print(e)
         return "Invalid request"
@@ -515,7 +525,7 @@ def masterbytickers():
             for (idx, t) in enumerate(result["quarTS"]):
                 if t1 <= t and t2 >= t:
                     if prev_ARR == 0:
-                        darr = NULL
+                        darr = None
                     else:
                         darr = result["arrTS"][idx] - prev_ARR
                     prev_ARR = result["arrTS"][idx]
