@@ -509,11 +509,17 @@ def masterbytickers():
 
             csv_IO = io.StringIO()
             writer = csv.writer(csv_IO)
-            writer.writerow(["Company Name", "Company CIK", "Company Ticker", "Company Description", "Quarter Start Date", "ARR", "Customers", "Employee", "NRR", "Sales and Marketing", "Source of Data", "Gross Margin", "Payback Period", "Implied Customer Acquisition Cost", "Lifetime Value"])
+            writer.writerow(["Company Name", "Company CIK", "Company Ticker", "Company Description", "Quarter Start Date", "ARR", "DARR", "Customers", "Employee", "NRR", "Sales and Marketing", "Source of Data", "Gross Margin", "Payback Period", "Implied Customer Acquisition Cost", "Lifetime Value"])
             writer.writerow([])
+            prev_ARR = 0
             for (idx, t) in enumerate(result["quarTS"]):
                 if t1 <= t and t2 >= t:
-                    writer.writerow([result["Name"], result["CIK"], result["Ticker"], result["description"], result["quarTS"][idx], result["arrTS"][idx], result["custTS"][idx], result["empTS"][idx], result["nrrTS"][idx], result["smTS"][idx], result["srcTS"][idx], result["gmTS"][idx], pbTS[idx], icacTS[idx], ltvTS[idx]])
+                    if prev_ARR == 0:
+                        darr = NULL
+                    else:
+                        darr = result["arrTS"][idx] - prev_ARR
+                    prev_ARR = result["arrTS"][idx]
+                    writer.writerow([result["Name"], result["CIK"], result["Ticker"], result["description"], result["quarTS"][idx], result["arrTS"][idx], darr, result["custTS"][idx], result["empTS"][idx], result["nrrTS"][idx], result["smTS"][idx], result["srcTS"][idx], result["gmTS"][idx], pbTS[idx], icacTS[idx], ltvTS[idx]])
             output = make_response(csv_IO.getvalue())
             output.headers["Content-Disposition"] = f"attachment; filename=metrics_{result['Name']}.csv"
             output.headers["Content-type"] = "text/csv"
