@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, abort, request, jsonify
+from flask import Flask, request, render_template, abort, request, jsonify, make_response
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 # from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -12,6 +12,8 @@ import numpy as np
 import re
 import os
 import json
+import csv
+import io
 # import spacy
 import requests
 
@@ -428,7 +430,7 @@ def earningstimeseries():
 def masterbytickers():
     req_data = request.get_json()
     try:
-        final = [];
+        final = []
         tickers = req_data["tickers"]
         t1 = req_data["from"]
         t2 = req_data["to"]
@@ -470,42 +472,53 @@ def masterbytickers():
             for (idx, x) in enumerate(result["nrrTS"]):
                 if x:
                     result["nrrTS"][idx] = round(float(x)*100, 2)
-            arrTS = []
-            custTS = []
-            empTS = []
-            nrrTS = []
-            quarTS = []
-            smTS = []
-            srcTS = []
-            gmTS = []
-            pbTS1 = []
-            icacTS1 = []
-            ltvTS1 = []
+            # arrTS = []
+            # custTS = []
+            # empTS = []
+            # nrrTS = []
+            # quarTS = []
+            # smTS = []
+            # srcTS = []
+            # gmTS = []
+            # pbTS1 = []
+            # icacTS1 = []
+            # ltvTS1 = []
+            # for (idx, t) in enumerate(result["quarTS"]):
+            #     if t1 <= t and t2 >= t:
+            #         quarTS.append(result["quarTS"][idx])
+            #         arrTS.append(result["arrTS"][idx])
+            #         custTS.append(result["custTS"][idx])
+            #         empTS.append(result["empTS"][idx])
+            #         nrrTS.append(result["nrrTS"][idx])
+            #         smTS.append(result["smTS"][idx])
+            #         srcTS.append(result["srcTS"][idx])
+            #         pbTS1.append(pbTS[idx])
+            #         icacTS1.append(icacTS[idx])
+            #         ltvTS1.append(ltvTS[idx])
+            # result["arrTS"] = arrTS
+            # result["custTS"] = custTS
+            # result["empTS"] = empTS
+            # result["nrrTS"] = nrrTS
+            # result["quarTS"] = quarTS
+            # result["smTS"]= smTS
+            # result["srcTS"] = srcTS
+            # result["gmTS"] = gmTS
+            # result["pbTS"]= pbTS1
+            # result["icacTS"] = icacTS1
+            # result["ltvTS"] = ltvTS1
+
+            csv_IO = io.StringIO()
+            writer = csv.writer(csv_IO)
+            writer.writerow(["Company Name", "Company CIK", "Company Ticker", "Company Description", "Quarter Start Date", "ARR", "Customers", "Employee", "NRR", "Sales and Marketing", "Source of Data", "Gross Margin", "Payback Period", "Implied Customer Acquisition Cost", "Lifetime Value"])
+            writer.writerow([])
             for (idx, t) in enumerate(result["quarTS"]):
                 if t1 <= t and t2 >= t:
-                    quarTS.append(result["quarTS"][idx])
-                    arrTS.append(result["arrTS"][idx])
-                    custTS.append(result["custTS"][idx])
-                    empTS.append(result["empTS"][idx])
-                    nrrTS.append(result["nrrTS"][idx])
-                    smTS.append(result["smTS"][idx])
-                    srcTS.append(result["srcTS"][idx])
-                    pbTS1.append(pbTS[idx])
-                    icacTS1.append(icacTS[idx])
-                    ltvTS1.append(ltvTS[idx])
-            result["arrTS"] = arrTS
-            result["custTS"] = custTS
-            result["empTS"] = empTS
-            result["nrrTS"] = nrrTS
-            result["quarTS"] = quarTS
-            result["smTS"]= smTS
-            result["srcTS"] = srcTS
-            result["gmTS"] = gmTS
-            result["pbTS"]= pbTS1
-            result["icacTS"] = icacTS1
-            result["ltvTS"] = ltvTS1
-            final.append(result)
-        return {"master": final}
+                    writer.writerow([result["Name"], result["CIK"], result["Ticker"], result["description"], result["quarTS"][idx], result["arrTS"][idx], result["custTS"][idx], result["empTS"][idx], result["nrrTS"][idx], result["smTS"][idx], result["srcTS"][idx], result["gmTS"][idx], pbTS[idx], icacTS[idx], ltvTS[idx]])
+            output = make_response(csv_IO.getvalue())
+            output.headers["Content-Disposition"] = f"attachment; filename=metrics_{result['Name']}.csv"
+            output.headers["Content-type"] = "text/csv"
+            # final.append({"ticker": ticker, "data": csv_IO.read()})
+        return output
     except Exception as e:
         print(e)
         return "Invalid request"
