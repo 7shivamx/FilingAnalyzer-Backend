@@ -304,14 +304,17 @@ def tsbyticker():
         for (idx, x) in enumerate(result["nrrTS"]):
             if x:
                 result["nrrTS"][idx] = round(float(x)*100, 2)
-        
+
         counter = 0
         darr = []
         for arr in result["arrTS"]:
             if counter == 0:
                 darr.append(None)
             else:
-                darr.append(arr-result["arrTS"][counter-1])
+            	if !result["arrTS"][counter-1] or !arr:
+            		darr.append(None)
+            	else:
+               	    darr.append(arr-result["arrTS"][counter-1])
             counter += 1
 
         return {"arrTS": result["arrTS"], "darr": darr, "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "ltvcac": ltvcac, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
@@ -521,10 +524,10 @@ def masterbytickers():
             writer = csv.writer(csv_IO)
             writer.writerow(["Company Name", "Company CIK", "Company Ticker", "Company Description", "Quarter Start Date", "ARR", "DARR", "Customers", "Employee", "NRR", "Sales and Marketing", "Source of Data", "Gross Margin", "Payback Period", "Implied Customer Acquisition Cost", "Lifetime Value"])
             writer.writerow([])
-            prev_ARR = 0
+            prev_ARR = None
             for (idx, t) in enumerate(result["quarTS"]):
                 if t1 <= t and t2 >= t:
-                    if prev_ARR == 0:
+                    if !prev_ARR or !result["arrTS"][idx]:
                         darr = None
                     else:
                         darr = result["arrTS"][idx] - prev_ARR
