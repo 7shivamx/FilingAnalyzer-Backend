@@ -314,7 +314,7 @@ def tsbyticker():
             	if (not result["arrTS"][counter-1]) or (not arr):
             		darr.append(None)
             	else:
-               	    darr.append(arr-result["arrTS"][counter-1])
+                    darr.append(round(arr-result["arrTS"][counter-1], 2))
             counter += 1
 
         return {"arrTS": result["arrTS"], "darr": darr, "pbTSlast": pbTS[-2], "cac": cac, "mg": mg, "ltvcac": ltvcac, "nrrTS": result["nrrTS"], "custTS": result["custTS"], "quarTS": result["quarTS"], "smTS": result["smTS"], "empTS": result["empTS"], "srcTS": result["srcTS"], "pbTS": pbTS, "icacTS": icacTS, "ltvTS": ltvTS}
@@ -531,6 +531,7 @@ def masterbytickers():
                         darr = None
                     else:
                         darr = result["arrTS"][idx] - prev_ARR
+                        darr = round(darr, 2)
                     prev_ARR = result["arrTS"][idx]
                     writer.writerow([result["Name"], result["CIK"], result["Ticker"], result["description"], result["quarTS"][idx], result["arrTS"][idx], darr, result["custTS"][idx], result["empTS"][idx], result["nrrTS"][idx], result["smTS"][idx], result["srcTS"][idx], result["gmTS"][idx], pbTS[idx], icacTS[idx], ltvTS[idx]])
             output = make_response(csv_IO.getvalue())
